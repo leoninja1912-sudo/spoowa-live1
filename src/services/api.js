@@ -2,8 +2,8 @@
 // Medusa.js Store API Client
 // ============================================================
 
-const MEDUSA_BACKEND_URL = import.meta.env.VITE_MEDUSA_BACKEND_URL ? `${import.meta.env.VITE_MEDUSA_BACKEND_URL}/store` : "/store";
-const ADMIN_API_URL = import.meta.env.VITE_MEDUSA_BACKEND_URL ? `${import.meta.env.VITE_MEDUSA_BACKEND_URL}/admin` : "/admin";
+const MEDUSA_BACKEND_URL = "/store";
+const ADMIN_API_URL = "/admin";
 
 // ============================================================
 // Publishable API Key — Medusa v2 requires this for store APIs
@@ -101,8 +101,7 @@ export async function registerCustomer({ first_name, last_name, email, password 
 
 export async function loginCustomer(email, password) {
   // Medusa v2 auth: POST /auth/customer/emailpass
-  const baseUrl = import.meta.env.VITE_MEDUSA_BACKEND_URL || "";
-  const authData = await request(`${baseUrl}/auth/customer/emailpass`, {
+  const authData = await request(`/auth/customer/emailpass`, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
@@ -138,8 +137,9 @@ export function isLoggedIn() {
  * @param {'google'} provider
  */
 export function getSocialAuthUrl(provider) {
-  const baseUrl = import.meta.env.VITE_MEDUSA_BACKEND_URL || "";
-  return `${baseUrl}/auth/customer/${provider}`;
+  // This hits the Medusa backend directly (not proxied /store)
+  // The Vite proxy forwards /auth/* to the backend
+  return `/auth/customer/${provider}`;
 }
 
 /**
@@ -351,6 +351,5 @@ export async function getOrderById(id) {
 // ============================================================
 
 export async function getHealthCheck() {
-  const baseUrl = import.meta.env.VITE_MEDUSA_BACKEND_URL || "";
-  return request(`${baseUrl}/health`);
+  return request(`/health`);
 }
